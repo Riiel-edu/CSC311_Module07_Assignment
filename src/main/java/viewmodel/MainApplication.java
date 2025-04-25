@@ -16,10 +16,10 @@ public class MainApplication extends Application {
     private static DbConnectivityClass cnUtil;
     private Stage primaryStage;
 
+
     public static void main(String[] args) {
         cnUtil = new DbConnectivityClass();
         launch(args);
-
     }
 
     public void start(Stage primaryStage) {

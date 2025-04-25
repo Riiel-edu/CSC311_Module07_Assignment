@@ -8,13 +8,12 @@ public class UserSession {
 
     private static UserSession instance;
 
-    private String userName;
-
-    private String password;
-    private String privileges;
+    private static String username;
+    private static String password;
+    private static String privileges;
 
     private UserSession(String userName, String password, String privileges) {
-        this.userName = userName;
+        this.username = userName;
         this.password = password;
         this.privileges = privileges;
         Preferences userPreferences = Preferences.userRoot();
@@ -25,42 +24,47 @@ public class UserSession {
 
 
 
-    public static UserSession getInstace(String userName,String password, String privileges) {
+    public static UserSession getInstance(String userName,String password, String privileges) {
         if(instance == null) {
             instance = new UserSession(userName, password, privileges);
         }
         return instance;
     }
 
-    public static UserSession getInstace(String userName,String password) {
+    public static UserSession getInstance(String userName,String password) {
         if(instance == null) {
             instance = new UserSession(userName, password, "NONE");
         }
         return instance;
     }
-    public String getUserName() {
-        return this.userName;
+    public static String getUserName() {
+        return username;
     }
 
-    public String getPassword() {
-        return this.password;
+    public static String getPassword() {
+        return password;
     }
 
-    public String getPrivileges() {
-        return this.privileges;
+    public static String getPrivileges() {
+        return privileges;
     }
 
-    public void cleanUserSession() {
-        this.userName = "";// or null
-        this.password = "";
-        this.privileges = "";// or null
+    public static void setCurrUser(String newuser, String newpass) {
+        username = newuser;
+        password = newpass;
+    }
+
+    public static void cleanUserSession() {
+        username = "";// or null
+        password = "";
+        privileges = "";// or null
     }
 
     @Override
     public String toString() {
         return "UserSession{" +
-                "userName='" + this.userName + '\'' +
-                ", privileges=" + this.privileges +
+                "userName='" + username + '\'' +
+                ", privileges=" + privileges +
                 '}';
     }
 }

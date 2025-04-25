@@ -18,42 +18,58 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.Animal;
 import model.Person;
 import service.MyLogger;
+import service.UserSession;
 
 import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DB_GUI_Controller implements Initializable {
 
     @FXML
-    TextField first_name, last_name, department, major, email, imageURL;
+    TextField name, animal_class, species, date_of_birth, exhibit;
     @FXML
     ImageView img_view;
     @FXML
     MenuBar menuBar;
     @FXML
-    private TableView<Person> tv;
+    Button editRecord, deleteRecord;
     @FXML
-    private TableColumn<Person, Integer> tv_id;
+    MenuItem editItem, deleteItem;
     @FXML
-    private TableColumn<Person, String> tv_fn, tv_ln, tv_department, tv_major, tv_email;
+    private TableView<Animal> tv;
+    @FXML
+    private TableColumn<Animal, Integer> tv_id;
+    @FXML
+    private TableColumn<Animal, String> tv_name, tv_class, tv_species, tv_dob, tv_exhibit;
     private final DbConnectivityClass cnUtil = new DbConnectivityClass();
-    private final ObservableList<Person> data = cnUtil.getData();
+    private ObservableList<Animal> data;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        //editItem.setDisable(true); deleteItem.setDisable(true);
+        //editRecord.setDisable(true); deleteRecord.setDisable(true);
+
+        cnUtil.setCurrUser(LoginController.getCurrentUsername());
+        data = cnUtil.getAnimals();
+
         try {
-            tv_id.setCellValueFactory(new PropertyValueFactory<>("id"));
-            tv_fn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-            tv_ln.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-            tv_department.setCellValueFactory(new PropertyValueFactory<>("department"));
-            tv_major.setCellValueFactory(new PropertyValueFactory<>("major"));
-            tv_email.setCellValueFactory(new PropertyValueFactory<>("email"));
+            tv_id.setCellValueFactory(new PropertyValueFactory<>("Id"));
+            tv_name.setCellValueFactory(new PropertyValueFactory<>("Name"));
+            tv_class.setCellValueFactory(new PropertyValueFactory<>("AnimalClass"));
+            tv_species.setCellValueFactory(new PropertyValueFactory<>("Species"));
+            tv_dob.setCellValueFactory(new PropertyValueFactory<>("DateOfBirth"));
+            tv_exhibit.setCellValueFactory(new PropertyValueFactory<>("Exhibit"));
+
             tv.setItems(data);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -61,29 +77,28 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void addNewRecord() {
+            cnUtil.insertAnimal(name.getText(), animal_class.getText(), species.getText(),
+                    date_of_birth.getText(), exhibit.getText());
 
-            Person p = new Person(first_name.getText(), last_name.getText(), department.getText(),
-                    major.getText(), email.getText(), imageURL.getText());
-            cnUtil.insertUser(p);
-            cnUtil.retrieveId(p);
-            p.setId(cnUtil.retrieveId(p));
-            data.add(p);
+            data.add(new Animal((data.size() + 1), name.getText(), animal_class.getText(), species.getText(),
+                    date_of_birth.getText(), exhibit.getText()));
+
             clearForm();
 
     }
 
     @FXML
     protected void clearForm() {
-        first_name.setText("");
-        last_name.setText("");
-        department.setText("");
-        major.setText("");
-        email.setText("");
-        imageURL.setText("");
+        name.setText("");
+        animal_class.setText("");
+        species.setText("");
+        date_of_birth.setText("");
+        exhibit.setText("");
     }
 
     @FXML
     protected void logOut(ActionEvent actionEvent) {
+        UserSession.cleanUserSession();
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
             Scene scene = new Scene(root, 900, 600);
@@ -116,22 +131,23 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void editRecord() {
-        Person p = tv.getSelectionModel().getSelectedItem();
-        int index = data.indexOf(p);
-        Person p2 = new Person(index + 1, first_name.getText(), last_name.getText(), department.getText(),
-                major.getText(), email.getText(),  imageURL.getText());
-        cnUtil.editUser(p.getId(), p2);
-        data.remove(p);
-        data.add(index, p2);
+        Animal a = tv.getSelectionModel().getSelectedItem();
+        int index = data.indexOf(a);
+        Animal a2 = new Animal(index + 1, name.getText(), animal_class.getText(), species.getText(),
+                date_of_birth.getText(), exhibit.getText());
+        cnUtil.editAnimal(a.getId(), a2.getName(), a2.getSpecies(), a2.getDateOfBirth(), a2.getAnimalClass(), a2.getExhibit());
+        data.remove(a);
+        data.add(index, a2);
         tv.getSelectionModel().select(index);
     }
 
     @FXML
     protected void deleteRecord() {
-        Person p = tv.getSelectionModel().getSelectedItem();
-        int index = data.indexOf(p);
-        cnUtil.deleteRecord(p);
+        Animal a = tv.getSelectionModel().getSelectedItem();
+        int index = data.indexOf(a);
+        cnUtil.removeAnimal(a.getId());
         data.remove(index);
+
         tv.getSelectionModel().select(index);
     }
 
@@ -150,13 +166,15 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void selectedItemTV(MouseEvent mouseEvent) {
-        Person p = tv.getSelectionModel().getSelectedItem();
-        first_name.setText(p.getFirstName());
-        last_name.setText(p.getLastName());
-        department.setText(p.getDepartment());
-        major.setText(p.getMajor());
-        email.setText(p.getEmail());
-        imageURL.setText(p.getImageURL());
+        Animal a = tv.getSelectionModel().getSelectedItem();
+        name.setText(a.getName());
+        species.setText(a.getSpecies());
+        date_of_birth.setText(a.getDateOfBirth());
+        animal_class.setText(a.getAnimalClass());
+        exhibit.setText(a.getExhibit());
+
+        //editItem.setDisable(false); deleteItem.setDisable(false);
+        //editRecord.setDisable(false); deleteRecord.setDisable(false);
     }
 
     public void lightTheme(ActionEvent actionEvent) {
@@ -214,7 +232,7 @@ public class DB_GUI_Controller implements Initializable {
         });
     }
 
-    private static enum Major {Business, CSC, CPIS}
+    private static enum Major { Business, CSC, CPIS }
 
     private static class Results {
 
@@ -227,6 +245,32 @@ public class DB_GUI_Controller implements Initializable {
             this.lname = date;
             this.major = venue;
         }
+    }
+
+    private static enum Class { Mammal, Bird, Fish, Reptiles, Amphibians, Invertebrates }
+
+    /**
+     * Checks whether the Name constraint "[a-zA-Z]{2,25}" is met.
+     * @param text The text being checked.
+     * @return True if the text matches the constraint, otherwise false.
+     */
+    public static boolean checkNameConstraint(String text) {
+        String pattern = "[a-zA-Z]{2,25}";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(text);
+        return m.matches();
+    }
+
+    /**
+     * Checks whether the Name constraint "[01][0-9]/[0123][0-9]/[0-9]{4}" is met.
+     * @param text The text being checked.
+     * @return True if the text matches the constraint, otherwise false.
+     */
+    public static boolean checkDateConstraint(String text) {
+        String pattern = "[01][0-9]/[0123][0-9]/[0-9]{4}";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(text);
+        return m.matches();
     }
 
 }

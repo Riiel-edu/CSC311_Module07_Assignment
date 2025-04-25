@@ -1,5 +1,6 @@
 package viewmodel;
 
+import dao.DbConnectivityClass;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,15 +9,27 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import model.UserLogins;
+import service.UserSession;
 
+import java.util.LinkedList;
 
 
 public class LoginController {
 
+    @FXML
+    TextField usernameTextField;
+    @FXML
+    TextField passwordField;
+
+    boolean canCreate;
+
+    static String currUsername;
 
     @FXML
     private GridPane rootpane;
@@ -47,6 +60,41 @@ public class LoginController {
     }
     @FXML
     public void login(ActionEvent actionEvent) {
+
+        canCreate = false;
+        DbConnectivityClass dao = new DbConnectivityClass();
+        dao.connectToDatabase();
+        LinkedList<UserLogins> users = dao.getUserLogins();
+        System.out.println(users);
+        String username = usernameTextField.getText();
+        String password = passwordField.getText();
+
+        if(!username.isEmpty() && !password.isEmpty()) {
+            for (UserLogins user : users) {
+                if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                    canCreate = true;
+                    break;
+                }
+            }
+
+            if(canCreate) {
+
+                currUsername = username;
+
+                try {
+                    Parent root = FXMLLoader.load(getClass().getResource("/view/signUp.fxml"));
+                    Scene scene = new Scene(root, 900, 600);
+                    scene.getStylesheets().add(getClass().getResource("/css/lightTheme.css").toExternalForm());
+                    Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+                    window.setScene(scene);
+                    window.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/view/db_interface_gui.fxml"));
             Scene scene = new Scene(root, 900, 600);
@@ -70,6 +118,10 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getCurrentUsername() {
+        return currUsername;
     }
 
 
