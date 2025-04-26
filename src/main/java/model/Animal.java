@@ -4,7 +4,7 @@ public class Animal {
 
     private int id;
     private String name;
-    private String animal_class;
+    private Animal_Class animal_class;
     private String species;
     private String date_of_birth;
     private String exhibit;
@@ -12,8 +12,7 @@ public class Animal {
     public Animal(int id, String name, String animal_class, String species, String date_of_birth, String exhibit) {
         this.id = id;
         this.name = name;
-        this.animal_class = animal_class;
-        /*
+
         switch(animal_class) {
             case "Mammal" -> this.animal_class = Animal_Class.Mammal;
             case "Bird" -> this.animal_class = Animal_Class.Bird;
@@ -23,7 +22,7 @@ public class Animal {
             case "Invertebrate" -> this.animal_class = Animal_Class.Invertebrate;
             default -> this.animal_class = Animal_Class.Unknown;
         }
-        */
+
         this.species = species;
         this.date_of_birth = date_of_birth;
         this.exhibit = exhibit;
@@ -46,8 +45,7 @@ public class Animal {
     }
 
     public String getAnimalClass() {
-        return this.animal_class;
-        /*
+
         switch (animal_class) {
             case Mammal -> { return "Mammal"; }
             case Bird -> { return "Bird";}
@@ -56,12 +54,11 @@ public class Animal {
             case Amphibian -> { return "Amphibian";}
             case Invertebrate -> { return "Invertebrate";}
             default -> { return "Unknown"; }
-        }*/
+        }
     }
 
     public void setAnimalClass(String animal_class) {
-        this.animal_class = animal_class;
-        /*
+
         switch(animal_class) {
             case "Mammal" -> this.animal_class = Animal_Class.Mammal;
             case "Bird" -> this.animal_class = Animal_Class.Bird;
@@ -69,7 +66,7 @@ public class Animal {
             case "Reptile" -> this.animal_class = Animal_Class.Reptile;
             case "Amphibian" -> this.animal_class = Animal_Class.Amphibian;
             case "Invertebrate" -> this.animal_class = Animal_Class.Invertebrate;
-        }*/
+        }
     }
 
     public String getSpecies() {

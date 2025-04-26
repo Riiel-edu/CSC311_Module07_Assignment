@@ -77,16 +77,14 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void addNewRecord() {
-            cnUtil.insertAnimal(name.getText(), animal_class.getValue(), species.getText(),
-                    date_of_birth.getText(), exhibit.getText());
+            if(checkNameConstraint(name.getText()) && checkNameConstraint(species.getText())  && checkDateConstraint(date_of_birth.getText()) && checkNameConstraint(exhibit.getText())) {
+                cnUtil.insertAnimal(name.getText(), animal_class.getValue(), species.getText(),
+                        date_of_birth.getText(), exhibit.getText());
 
-            System.out.println(animal_class.getValue());
-
-            data.add(new Animal((data.size() + 1), name.getText(), animal_class.getValue(), species.getText(),
-                    date_of_birth.getText(), exhibit.getText()));
-
-            clearForm();
-
+                data.add(new Animal((data.size() + 1), name.getText(), animal_class.getValue(), species.getText(),
+                        date_of_birth.getText(), exhibit.getText()));
+                clearForm();
+            }
     }
 
     @FXML
@@ -133,14 +131,16 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void editRecord() {
-        Animal a = tv.getSelectionModel().getSelectedItem();
-        int index = data.indexOf(a);
-        Animal a2 = new Animal(index + 1, name.getText(), animal_class.getValue(), species.getText(),
-                date_of_birth.getText(), exhibit.getText());
-        cnUtil.editAnimal(a.getId(), a2.getName(), a2.getSpecies(), a2.getDateOfBirth(), a2.getAnimalClass(), a2.getExhibit());
-        data.remove(a);
-        data.add(index, a2);
-        tv.getSelectionModel().select(index);
+        if(checkNameConstraint(name.getText()) && checkNameConstraint(species.getText())  && checkDateConstraint(date_of_birth.getText()) && checkNameConstraint(exhibit.getText())) {
+            Animal a = tv.getSelectionModel().getSelectedItem();
+            int index = data.indexOf(a);
+            Animal a2 = new Animal(index + 1, name.getText(), animal_class.getValue(), species.getText(),
+                    date_of_birth.getText(), exhibit.getText());
+            cnUtil.editAnimal(a.getId(), a2.getName(), a2.getSpecies(), a2.getDateOfBirth(), a2.getAnimalClass(), a2.getExhibit());
+            data.remove(a);
+            data.add(index, a2);
+            tv.getSelectionModel().select(index);
+        }
     }
 
     @FXML
