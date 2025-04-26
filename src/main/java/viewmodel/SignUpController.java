@@ -1,6 +1,7 @@
 package viewmodel;
 
 import dao.DbConnectivityClass;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,9 +29,10 @@ public class SignUpController {
         canCreate = true;
         DbConnectivityClass dao = new DbConnectivityClass();
         dao.connectToDatabase();
-        LinkedList<UserLogins> users = dao.getUserLogins();
+        ObservableList<UserLogins> users = dao.getUserLogins();
         String username = usernameField.getText();
         String password = passwordField.getText();
+
         if(!username.isEmpty() && !password.isEmpty()) {
             for (UserLogins user : users) {
                 if (user.getUsername().equals(username)) {
@@ -38,6 +40,7 @@ public class SignUpController {
                     break;
                 }
             }
+
             if(canCreate) {
                 dao.insertUserLogin(username, password);
 

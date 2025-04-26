@@ -33,7 +33,9 @@ import java.util.regex.Pattern;
 public class DB_GUI_Controller implements Initializable {
 
     @FXML
-    TextField name, animal_class, species, date_of_birth, exhibit;
+    TextField name, species, date_of_birth, exhibit;
+    @FXML
+    ComboBox<String> animal_class;
     @FXML
     ImageView img_view;
     @FXML
@@ -54,10 +56,8 @@ public class DB_GUI_Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        //editItem.setDisable(true); deleteItem.setDisable(true);
-        //editRecord.setDisable(true); deleteRecord.setDisable(true);
-
-        cnUtil.setCurrUser(LoginController.getCurrentUsername());
+        animal_class.setItems(FXCollections.observableArrayList("Mammal", "Bird", "Fish", "Reptile", "Amphibian", "Invertebrate"));
+        cnUtil.setCurrUser(UserSession.getUserName());
         data = cnUtil.getAnimals();
 
         try {
@@ -77,10 +77,12 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void addNewRecord() {
-            cnUtil.insertAnimal(name.getText(), animal_class.getText(), species.getText(),
+            cnUtil.insertAnimal(name.getText(), animal_class.getValue(), species.getText(),
                     date_of_birth.getText(), exhibit.getText());
 
-            data.add(new Animal((data.size() + 1), name.getText(), animal_class.getText(), species.getText(),
+            System.out.println(animal_class.getValue());
+
+            data.add(new Animal((data.size() + 1), name.getText(), animal_class.getValue(), species.getText(),
                     date_of_birth.getText(), exhibit.getText()));
 
             clearForm();
@@ -90,7 +92,7 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     protected void clearForm() {
         name.setText("");
-        animal_class.setText("");
+        animal_class.setValue("");
         species.setText("");
         date_of_birth.setText("");
         exhibit.setText("");
@@ -133,7 +135,7 @@ public class DB_GUI_Controller implements Initializable {
     protected void editRecord() {
         Animal a = tv.getSelectionModel().getSelectedItem();
         int index = data.indexOf(a);
-        Animal a2 = new Animal(index + 1, name.getText(), animal_class.getText(), species.getText(),
+        Animal a2 = new Animal(index + 1, name.getText(), animal_class.getValue(), species.getText(),
                 date_of_birth.getText(), exhibit.getText());
         cnUtil.editAnimal(a.getId(), a2.getName(), a2.getSpecies(), a2.getDateOfBirth(), a2.getAnimalClass(), a2.getExhibit());
         data.remove(a);
@@ -170,7 +172,7 @@ public class DB_GUI_Controller implements Initializable {
         name.setText(a.getName());
         species.setText(a.getSpecies());
         date_of_birth.setText(a.getDateOfBirth());
-        animal_class.setText(a.getAnimalClass());
+        animal_class.setValue(a.getAnimalClass());
         exhibit.setText(a.getExhibit());
 
         //editItem.setDisable(false); deleteItem.setDisable(false);
@@ -246,8 +248,6 @@ public class DB_GUI_Controller implements Initializable {
             this.major = venue;
         }
     }
-
-    private static enum Class { Mammal, Bird, Fish, Reptiles, Amphibians, Invertebrates }
 
     /**
      * Checks whether the Name constraint "[a-zA-Z]{2,25}" is met.

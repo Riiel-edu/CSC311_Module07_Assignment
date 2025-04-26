@@ -5,9 +5,9 @@ public class UserLogins {
     private String username;
     private String password;
 
-    public UserLogins(String password, String username) {
-        this.password = password;
+    public UserLogins(String username, String password) {
         this.username = username;
+        this.password = password;
     }
 
     public String getPassword() {

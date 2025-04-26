@@ -2,6 +2,7 @@ package viewmodel;
 
 import dao.DbConnectivityClass;
 import javafx.animation.FadeTransition;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,8 +29,6 @@ public class LoginController {
     TextField passwordField;
 
     boolean canCreate;
-
-    static String currUsername;
 
     @FXML
     private GridPane rootpane;
@@ -64,8 +63,7 @@ public class LoginController {
         canCreate = false;
         DbConnectivityClass dao = new DbConnectivityClass();
         dao.connectToDatabase();
-        LinkedList<UserLogins> users = dao.getUserLogins();
-        System.out.println(users);
+        ObservableList<UserLogins> users = dao.getUserLogins();
         String username = usernameTextField.getText();
         String password = passwordField.getText();
 
@@ -79,10 +77,10 @@ public class LoginController {
 
             if(canCreate) {
 
-                currUsername = username;
+                UserSession.setCurrUser(username, password);
 
                 try {
-                    Parent root = FXMLLoader.load(getClass().getResource("/view/signUp.fxml"));
+                    Parent root = FXMLLoader.load(getClass().getResource("/view/db_interface_gui.fxml"));
                     Scene scene = new Scene(root, 900, 600);
                     scene.getStylesheets().add(getClass().getResource("/css/lightTheme.css").toExternalForm());
                     Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -93,17 +91,6 @@ public class LoginController {
                 }
 
             }
-        }
-
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/view/db_interface_gui.fxml"));
-            Scene scene = new Scene(root, 900, 600);
-            scene.getStylesheets().add(getClass().getResource("/css/lightTheme.css").toExternalForm());
-            Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            window.setScene(scene);
-            window.show();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -118,10 +105,6 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static String getCurrentUsername() {
-        return currUsername;
     }
 
 

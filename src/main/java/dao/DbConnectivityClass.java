@@ -75,6 +75,7 @@ public class DbConnectivityClass {
                 preparedStatement.setString(1, username);
                 preparedStatement.setString(2, password);
 
+                preparedStatement.executeUpdate();
                 preparedStatement.close();
                 conn.close();
             } catch (SQLException e) {
@@ -82,8 +83,8 @@ public class DbConnectivityClass {
             }
         }
 
-    public LinkedList<UserLogins> getUserLogins() {
-        LinkedList<UserLogins> logins = new LinkedList<>();
+    public ObservableList<UserLogins> getUserLogins() {
+        ObservableList<UserLogins> logins = FXCollections.observableArrayList(new ArrayList<>());
 
         try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
@@ -98,6 +99,7 @@ public class DbConnectivityClass {
                 logins.add(new UserLogins(username, password));
             }
 
+            preparedStatement.executeUpdate();
             preparedStatement.close();
             conn.close();
         } catch (SQLException e) {
@@ -108,6 +110,7 @@ public class DbConnectivityClass {
     }
 
     public ObservableList<Animal> getAnimals() {
+
         ObservableList<Animal> animals = FXCollections.observableArrayList(new ArrayList<>());
 
         try {
@@ -124,9 +127,11 @@ public class DbConnectivityClass {
                 String species = resultSet.getString("species");
                 String date_of_birth = resultSet.getString("date_of_birth");
                 String exhibit = resultSet.getString("exhibit");
-                animals.add(new Animal(id, name, animal_class, species, date_of_birth, exhibit));
+                animals.add(new Animal(id, name, species, date_of_birth, animal_class, exhibit));
             }
 
+            System.out.println(animals);
+            preparedStatement.executeUpdate();
             preparedStatement.close();
             conn.close();
         } catch (SQLException e) {
@@ -149,6 +154,7 @@ public class DbConnectivityClass {
             preparedStatement.setString(5, exhibit);
             preparedStatement.setString(6, username);
 
+            preparedStatement.executeUpdate();
             preparedStatement.close();
             conn.close();
         } catch (SQLException e) {
@@ -177,8 +183,8 @@ public class DbConnectivityClass {
                     "', species = '" + species +
                     "', date_of_birth = '" + date_of_birth +
                     "', animal_class = '" + animal_class +
-                    "' exhibit = '" + exhibit +
-                    "' WHERE id = " + id + " and username = " + username;
+                    "', exhibit = '" + exhibit +
+                    "' WHERE id = " + id + " and username = '" + username + "'";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             preparedStatement.executeUpdate();
